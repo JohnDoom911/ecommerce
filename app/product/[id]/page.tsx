@@ -1,10 +1,9 @@
 "use client";
 
 // TODO 1: React hook-уудыг импортлох (useState, useEffect)
-
+import { useEffect, useState } from "react";
 // TODO 2: useParams импортлох
-// import { useParams } from "next/navigation";
-
+import { useParams } from "next/navigation";
 import Link from "next/link";
 
 // TODO 3: Product төрөл зарлах
@@ -13,16 +12,22 @@ import Link from "next/link";
 
 export default function ProductDetail() {
   // TODO 4: URL-ээс id параметр авах
-  // const { id } = useParams();
-
+const { id } = useParams();
+const [product, setProduct] = useState<any>(null)
   // TODO 5: State хувьсагчдыг зарлах (product, loading, error)
-
+useEffect(() => {
+  fetch('https://dummyjson.com/products/${id}')
+    .then((res) => res.json())
+    .then((data) => {
+      setProduct(data);
+  });
+}, []);
   // TODO 6: useEffect-ээр бүтээгдэхүүний мэдээлэл татах
   // URL: `https://dummyjson.com/products/${id}`
   // dependency array: [id]
 
   // TODO 7: Ачааллын төлөв (loading state)
-
+if (!product) return null;
   // TODO 8: Алдааны төлөв (error state)
 
   return (
@@ -36,7 +41,7 @@ export default function ProductDetail() {
               href="/"
               className="rounded-lg border border-zinc-200 px-3 py-1.5 text-sm font-medium text-zinc-600 transition-colors hover:bg-zinc-50 dark:border-zinc-700 dark:text-zinc-400 dark:hover:bg-zinc-800"
             >
-              &larr; Буцах
+              &larr; Return
             </Link>
             <div>
               <h1 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-100">Product Store</h1>
