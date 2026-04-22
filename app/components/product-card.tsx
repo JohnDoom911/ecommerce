@@ -1,8 +1,8 @@
 import Link from "next/link"
-import { Products } from "../types"
+import { Product } from "../types"
 import Image from 'next/image'
 
-export const ProductCard = ({ product } : {product: Products}) => {
+export const ProductCard = ({ product } : {product: Product}) => {
     return(
         <Link href="./product/1" className="group rounded-2xl border border-zinc-200 bg-white shadow-sm transition-all hover:shadow-lg hover:-translate-y-1 dark:border-zinc-800 dark:bg-zinc-900">
             <div className="relative overflow-hidden rounded-t-2xl bg-zinc-100 dark:bg-zinc-800">

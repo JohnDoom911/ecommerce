@@ -28,9 +28,12 @@ export const Nav = () => {
               All
             </Link>
           </li>
-          {categories.slice(0, 10).map((category) => (
+          {categories.map((category) => (
             <li key={category.slug}>
-              <Link href={`/category/${category.slug}`} className={slug === category.slug ? activeClasess : defualtClasses}>
+              <Link 
+                href={`/category/${category.slug}`} 
+                className={slug === category.slug ? activeClasess : defualtClasses}
+              >
                 {category.name}
               </Link>
             </li>
