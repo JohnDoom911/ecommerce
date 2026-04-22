@@ -1,90 +1,87 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { ProductApiResponse, Products } from "./types";
+import { Product } from "./types";
+import { Header } from "./components/header";
+import { Nav } from "./components/nav";
 import { ProductCard } from "./components/product-card";
-import { SearchBar } from "./components/search-bar";
-import { CategoryNav } from "./components/category-nav";
 import { Pagination } from "./components/pagination";
 
 const PRODUCTS_PER_PAGE = 10;
 
 export default function Home() {
-  const [products, setProducts] = useState<Products[]>([]);
-  const [loading, setLoading] = useState(true); 
-  const [error, setError] = useState("");
+  const [products, setProducts] = useState<Product[]>([]);
+  const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
-  const [category, setCategory] = useState("");
-  const [skip, setSkip] = useState(0);
   const [total, setTotal] = useState(0);
+  const [skip, setSkip] = useState(0);
 
   useEffect(() => {
-    const controller = new AbortController();
     let url = `https://dummyjson.com/products?limit=${PRODUCTS_PER_PAGE}&skip=${skip}`;
-    if (search) url = `https://dummyjson.com/products/search?q=${search}&limit=${PRODUCTS_PER_PAGE}&skip=${skip}`;
-    else if (category) url = `https://dummyjson.com/products/category/${category}?limit=${PRODUCTS_PER_PAGE}&skip=${skip}`;
-      const fetchData = async () => {
-      setLoading(true);
-      setError("");
-      try {
-        const res = await fetch(url, { signal: controller.signal });
-        if (!res.ok) throw new Error("Network response was not ok");
-        
-        const data: ProductApiResponse = await res.json();
+    if (search) {
+      url = `https://dummyjson.com/products/search?q=${search}&limit=${PRODUCTS_PER_PAGE}&skip=${skip}`;
+    }
+    fetch(url)
+      .then((res) => res.json())
+      .then((data) => {
         setProducts(data.products);
         setTotal(data.total);
-      } catch (err: unknown) {
-        if (err instanceof Error && err.name === 'AbortError') {
-          return; 
-        }
-        setError("Encountered an error...");
-        console.error("Fetch error:", err);
-      } finally {
         setLoading(false);
-      }
-    };
-    fetchData();
-    return () => controller.abort();
-  }, [skip, search, category]);
-  
+      });
+  }, [search, skip]);
+
+  if (loading) {
+    return <div className="w-full py-20 text-center text-2xl">Loading...</div>;
+  }
+
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
-      <header className="border-b border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900 p-6">
-        <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-100 mx-auto max-w-7xl">
-          Product Store
-        </h1>
-      </header>
+      {/* Header */}
+      <Header />
 
-      <CategoryNav 
-        activeCategory={category} 
-        onCategoryChange={(cat) => { setCategory(cat); setSearch(""); setSkip(0); }} 
-      />
+      <Nav />
 
+      {/* Main Content */}
       <main className="mx-auto max-w-7xl px-6 py-10">
-        <SearchBar 
-          value={search} 
-          onChange={(e) => { setSearch(e.target.value); setCategory(""); setSkip(0); }} 
+        {/* Search */}
+        <div className="mb-8">
+          <input
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+            }}
+            type="text"
+            placeholder="Бүтээгдэхүүн хайх..."
+            className="w-full rounded-xl border border-zinc-200 bg-white px-4 py-3 text-sm text-zinc-900 placeholder-zinc-400 shadow-sm outline-none transition-colors focus:border-zinc-400 focus:ring-2 focus:ring-zinc-200 dark:border-zinc-700 dark:bg-zinc-900 dark:text-zinc-100 dark:placeholder-zinc-500 dark:focus:border-zinc-500 dark:focus:ring-zinc-800 sm:max-w-md"
+          />
+        </div>
+
+        <p className="mb-6 text-sm text-zinc-500 dark:text-zinc-400">{/* TODO 12: Бүтээгдэхүүний тоо харуулах */}0 products found</p>
+
+        {/* TODO 13: Доорх hardcode-г products.map() ашиглан солих */}
+        <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {products.map((product) => {
+            return <ProductCard key={product.id} product={product} />;
+          })}
+        </div>
+
+        {/* Pagination */}
+        <Pagination
+          handlePrev={() => {
+            setSkip(skip - PRODUCTS_PER_PAGE);
+          }}
+          handleNext={() => {
+            setSkip(skip + PRODUCTS_PER_PAGE);
+          }}
+          totalPages={Math.ceil(total / PRODUCTS_PER_PAGE)}
+          currentPage={skip / PRODUCTS_PER_PAGE + 1}
         />
-
-        {error && <p className="text-center text-red-500 py-4">{error}</p>}
-
-        {loading ? (
-          <p className="text-center py-10">Loading...</p>
-        ) : (
-          <>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {products.map((p) => <ProductCard key={p.id} product={p} />)}
-            </div>
-            <Pagination 
-              skip={skip} 
-              total={total} 
-              limit={PRODUCTS_PER_PAGE}
-              onPrev={() => setSkip(s => Math.max(0, s - PRODUCTS_PER_PAGE))}
-              onNext={() => setSkip(s => s + PRODUCTS_PER_PAGE)}
-            />
-          </>
-        )}
       </main>
+
+      {/* Footer */}
+      <footer className="mt-auto border-t border-zinc-200 bg-white dark:border-zinc-800 dark:bg-zinc-900">
+        <div className="mx-auto max-w-7xl px-6 py-4 text-center text-xs text-zinc-400">Exercise App &middot; Data from dummyjson.com</div>
+      </footer>
     </div>
   );
 }
