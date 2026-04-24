@@ -19,7 +19,7 @@ export const Header = () => {
                         {!user ? (
                              <div>
                         <Link href={"/login"}
-                        className="w-full rounded-xl bg-zinc-900 px-4 py-3 text-sm font-medium 
+                        className="w-full justify-between rounded-xl bg-zinc-900 px-4 py-3 text-sm font-medium 
                                 text-white shadow-sm transition-colors hover:bg-zinc-800 
                                 disabled:cursor-not-allowed disabled:opacity-50 dark:bg-zinc-100 
                                 dark:text-zinc-900 dark:hover:bg-zinc-200">

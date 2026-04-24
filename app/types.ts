@@ -39,7 +39,7 @@ export type Product = {
   thumbnail: string;
 };
 
-type Review = {
+export type Review = {
   rating: number;
   comment: string;
   date: string; // ISO date string
